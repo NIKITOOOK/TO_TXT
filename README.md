@@ -79,3 +79,17 @@ Solution: Install FFmpeg and ensure it's in your PATH
 
 Problem: CUDA out of memory
 Solution: Use a smaller model or split audio into chunks
+
+---
+
+## Длинные записи (faster-whisper, Colab T4)
+
+- `pipeline/transcribe.py` — `large-v3` кусками по 1200 с (весь файл сразу падает по памяти), VAD
+- `pipeline/clean_hallucinations.py` — убирает «Продолжение следует», «Субтитры сделал…» и т.п.
+- `tests/` — тесты чистилки: `python -m unittest discover -s tests`
+
+```bash
+pip install -q faster-whisper nvidia-cublas-cu12 nvidia-cudnn-cu12
+python pipeline/transcribe.py lecture.mp4 out.txt --prompt "тема и термины"
+python pipeline/clean_hallucinations.py out.txt -o out.clean.txt
+```
