@@ -104,3 +104,9 @@ python pipeline/clean_hallucinations.py out.txt -o out.clean.txt
 - `clean_hallucinations.py`: вырезает известные подписи целой строкой, показывает повторы подряд
 
 В коротком тесте (`small`, CPU, клип лекции + тишина + шум) VAD дал 0 вставок в тишину, без него была одна. Отключение проверки уверенности (`log_prob_threshold=None`) ничего не изменило. На `large-v3` не проверено.
+
+### Тест выдумок на large-v3
+```bash
+python tests/silence_test.py lecture.mp4 --model large-v3 --start 1500
+```
+Берёт 150 с речи, добавляет 35 с тишины и 35 с шума, гонит 4 набора настроек. Смотреть «вставок в тишине» (должно быть 0) и «символов речи» (не должно падать). На `small` с VAD было 0 вставок, а `log_prob_threshold=None` ничего не дал.
