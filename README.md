@@ -93,3 +93,14 @@ pip install -q faster-whisper nvidia-cublas-cu12 nvidia-cudnn-cu12
 python pipeline/transcribe.py lecture.mp4 out.txt --prompt "тема и термины"
 python pipeline/clean_hallucinations.py out.txt -o out.clean.txt
 ```
+
+### Проблема: Whisper выдумывает текст на тишине
+
+На пустом окне (тишина, шум, музыка) Whisper пишет «Продолжение следует», «Субтитры сделал DimaTorzok», «Спасибо за просмотр»: так заканчивались видео в его обучающих данных. Датчик «речи нет» срабатывает, но кусок отбрасывается, только если текст ещё и неуверенный, а выдумка пишется уверенно.
+
+Что сделано:
+- VAD (`vad_filter=True`): в тишину и шум модель не попадает
+- `condition_on_previous_text=False`: выдумка и повторы не тянутся дальше по тексту
+- `clean_hallucinations.py`: вырезает известные подписи целой строкой, показывает повторы подряд
+
+В коротком тесте (`small`, CPU, клип лекции + тишина + шум) VAD дал 0 вставок в тишину, без него была одна. Отключение проверки уверенности (`log_prob_threshold=None`) ничего не изменило. На `large-v3` не проверено.
